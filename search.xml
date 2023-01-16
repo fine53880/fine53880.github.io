@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>文件上传漏洞</title>
+      <link href="/2023/01/16/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/"/>
+      <url>/2023/01/16/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E/</url>
+      
+        <content type="html"><![CDATA[<span id="more"></span><h1 id="文件上传漏洞"><a href="#文件上传漏洞" class="headerlink" title="文件上传漏洞"></a>文件上传漏洞</h1><p>文件上传漏洞是指由于程序员在对用户文件上传部分的控制不足或者处理缺陷，而导致的用户可以越过其本身权限向服务器上上传可执行的动态脚本文件。这里上传的文件可以是木马，病毒，恶意脚本或者WebShell等。“文件上传”本身没有问题，有问题的是文件上传后，服务器怎么处理、解释文件。如果服务器的处理逻辑做的不够安全，则会导致严重的后果。</p><p>什么是webshell？<br>WebShell就是以asp、php、jsp或者cgi等网页文件形式存在的一种命令执行环境，也可以将其称之为一种网页后门。攻击者在入侵了一个网站后，通常会将这些asp或php后门文件与网站服务器web目录下正常的网页文件混在一起，然后使用浏览器来访问这些后门，得到一个命令执行环境，以达到控制网站服务器的目的（可以上传下载或者修改文件，操作数据库，执行任意命令等）。 WebShell后门隐蔽较性高，可以轻松穿越防火墙，访问WebShell时不会留下系统日志，只会在网站的web日志中留下一些数据提交记录。</p><p><strong>一句话木马</strong></p><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">phpinfo</span>();<span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span> @<span class="keyword">eval</span>(<span class="variable">$_POST</span>[cmd]);<span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span> @<span class="keyword">eval</span>(<span class="variable">$_REQUEST</span>[cmd]);<span class="meta">?&gt;</span></span><br><span class="line"><span class="meta">&lt;?php</span> <span class="title function_ invoke__">assert</span>(<span class="variable">$_REQUEST</span>[cmd]); <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure><h2 id="上传漏洞绕过"><a href="#上传漏洞绕过" class="headerlink" title="上传漏洞绕过"></a>上传漏洞绕过</h2><h4 id="1-客服端绕过"><a href="#1-客服端绕过" class="headerlink" title="1.客服端绕过"></a>1.客服端绕过</h4><p>（1）客户端校验:</p><p>一般都是在网页上写一段 javascript 脚本，校验上传文件的后缀名，有白名单形式也有黑名单形式。判断方式：在浏览加载文件，但还未点击上传按钮时便弹出对话框，内容如：只允许上传.jpg&#x2F;.jpeg&#x2F;.png后缀名的文件，而此时并没有发送数据包。</p><p>（2）绕过方法:</p><p>1.通过禁用 JS 脚本；</p><p>2.通过删除 onsubmit&#x3D;”return checkFile()” </p><p>3.通过利用 burp 抓包改包，先上传一个 gif 类型的木马，然后通过 burp 将其改为asp&#x2F;php&#x2F;jsp 后缀名即可 注意：这里修改文件名字后，请求头中的 Content-Length 的值也要改。</p><h4 id="2-服务端绕过"><a href="#2-服务端绕过" class="headerlink" title="2.服务端绕过"></a>2.服务端绕过</h4><h6 id="1-黑名单扩展名绕过"><a href="#1-黑名单扩展名绕过" class="headerlink" title="1.黑名单扩展名绕过"></a>1.黑名单扩展名绕过</h6><p>黑名单检测：一般有个专门的 blacklist 文件，里面会包含常见的危险脚本文件。绕过方法：（1）找黑名单扩展名的漏网之鱼 - 比如 iis6.0 中的 asa 和 cer （2）可能存在大小写绕过漏洞 - 比如 aSp(iis6.0 中可以）和 pHp（只能在 小于 php5.3.39 中的 linux 中）之中 （3）能被web容器解析的文件其他扩展名列表：</p><p>jsp, jspx ,jspf</p><p>asp asa cer cdx,htr,xml,html</p><p>aspx,ashx,asmx,asax,ascx</p><h6 id="2-黑名单特殊后缀名绕过"><a href="#2-黑名单特殊后缀名绕过" class="headerlink" title="2.黑名单特殊后缀名绕过"></a>2.黑名单特殊后缀名绕过</h6><p>将Burpsuite截获的数据包中backlion.php名字改为 baclion.php4(php1,php2,php3,php4,php5), 前提条件是 http.conf 中设置 AddType application&#x2F;x-httpd-php .php1(php 的版本小于等于 5.3.29 以下)</p><h6 id="3-单双重后缀名绕过"><a href="#3-单双重后缀名绕过" class="headerlink" title="3.单双重后缀名绕过"></a>3.单双重后缀名绕过</h6><p>上传时将 Burpsuite 截的数据包中文件名 backlion.php（backlion.asa)改 为 backlion.pphphph(backlion.asasaa)，那么过滤了第一个”php”字符串”后， 开头的’p’和结尾的’hp’就组合又形成了 php</p><h6 id="4-服务端-MIME-文件类型-Content-Type-绕过"><a href="#4-服务端-MIME-文件类型-Content-Type-绕过" class="headerlink" title="4.服务端 MIME 文件类型(Content-Type)绕过"></a>4.服务端 MIME 文件类型(Content-Type)绕过</h6><p>MIME 的作用：使客户端软件，区分不同种类的数据，例如web浏览器就是通过 MIME 类 型来判断文件是GIF图片，还是可打印的 PostScript 文件。web服务器使用 MIME 来说明发送数据的种类，web客户端使用 MIME 来说明希望接收到的数据种类，它是服务器用来判断浏览器传递文件格式的重要标记项。</p><p>绕过方法：上传对文件类型做了限制，可通过 burpsuit 将其他类文件类型 修改为如：Content-Type：image&#x2F;gif 和 image&#x2F;jpeg 等运行的文件类型。</p><h4 id="3-白名单绕过："><a href="#3-白名单绕过：" class="headerlink" title="3.白名单绕过："></a>3.白名单绕过：</h4><h6 id="1-配合web容器的解析漏洞："><a href="#1-配合web容器的解析漏洞：" class="headerlink" title="1.配合web容器的解析漏洞："></a>1.配合web容器的解析漏洞：</h6><p><strong>IIS中的目录解析漏洞和分号解析漏洞</strong> ：将一句话木马的文件名 backlion.php，改成 backlion.php.abc(奇怪的不被解析的后缀名都 行)。首先， 服务器验证文件扩展名的时候，验证的是.abc，只要该扩展名符合服务器端黑白名单，即可上传。</p><p><strong>nginx 空字节漏洞</strong> xxx.jpg%00.php 这样的文件名会被解析为php代码运行。</p><p><strong>apache 的解析漏洞</strong>，上传如 a.php.rar a.php.gif 类型的文件名，可以避免 对于php文件的过滤机制，但是由于 apache 在解析文件名的时候是从右向左读，如果遇到不能识别的扩展名则跳过，rar 等扩展名是 apache 不能识别的， 因此就会直接将类型识别为 php，从而达到了注入php代码的目的。</p><h6 id="2-00-截断上传绕过"><a href="#2-00-截断上传绕过" class="headerlink" title="2.%00 截断上传绕过"></a>2.%00 截断上传绕过</h6><p>通过抓包截断将 backlion.asp.jpg 后面的一个.换成%00 在上传的时候即 backlion.asp%00.jpg，当文件系统读到%00 时，会认为文件已经结束，从而将 backlion.asp.jpg 的内容写入到 backlion.asp 中，从而达到攻击的目的。%00 不是针对所有基于白名单的后缀名检查都能绕过，代码的实现过程中必须存在截 断上传漏洞，上传格式如下：bk.asp%00.jpg</p><h6 id="3-文件头内容检测绕过"><a href="#3-文件头内容检测绕过" class="headerlink" title="3.文件头内容检测绕过"></a>3.文件头内容检测绕过</h6><p>不同的图片文件都有不同文件头，如： PNG：文件头标识 (8 bytes) 89 50 4E 47 0D 0A 1A 0A JPEG： 文件头标识 (2 bytes): 0xff, 0xd8 (SOI) (JPEG 文件标识) GIF：文件头标识 (6 bytes) 47 49 46 38 39(37) 61 上传文件的时候会检查上传文件是否合法，如图片文件是否文件头含有 gif89, 这里可以通过一句话图片木马生成工具 edjpgcom 戒者通过编辑器在木马内容基础上再加了一些文件信息，有点像下面的结构:</p><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GIF89a <span class="meta">&lt;?php</span> <span class="title function_ invoke__">phpinfo</span>(); <span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure><h4 id="4-二次渲染绕过"><a href="#4-二次渲染绕过" class="headerlink" title="4.二次渲染绕过"></a>4.二次渲染绕过</h4><p>在制作图片马的时候，往往是在图片后头附件一段php代码，或者是改包发送一个图片马。但是如果使用了二次渲染。我们上传的文件名称会被修改，并且文件末尾段一些冗余的信息（一句话木马）会被删除。</p><p>所以很明显，我们只需要将我们需要写入的东西塞在图片中间（虽然会使图片损坏，但是我们又不需要图片。），用winhex或者是010editor等在文件内进行修改即可。</p><h4 id="5-条件竞争"><a href="#5-条件竞争" class="headerlink" title="5.条件竞争"></a>5.条件竞争</h4><p>条件竞争漏洞是一种服务器端的漏洞，由于服务器端在处理不同用户的请求时是并发进行的，因此，如果并发处理不当或相关操作逻辑顺序设计的不合理时，将会导致此类问题的发生。</p><p>该漏洞一般出现在与数据库系统频繁交互的位置，例如金额同步、支付等较敏感操作处。另外条件竞争漏洞也会出现在其他位置，例如文件的操作处理等。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> ctf </category>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CTF </tag>
+            
+            <tag> web安全 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>CSRF跨站请求伪造</title>
       <link href="/2023/01/15/CSRF/"/>
       <url>/2023/01/15/CSRF/</url>

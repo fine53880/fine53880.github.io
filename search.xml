@@ -46,7 +46,9 @@
           
           <category> ctf </category>
           
-          <category> web，sql注入 </category>
+          <category> web </category>
+          
+          <category> sql注入 </category>
           
       </categories>
       

